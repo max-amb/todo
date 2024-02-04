@@ -1,6 +1,6 @@
 use std::env;
 use clap::{error::*,  Parser, Subcommand};
-mod add; mod delete;
+mod add; mod delete; mod list;
 
 #[derive(Parser)]
 #[command(name = "todo")]
@@ -38,7 +38,7 @@ fn main() -> Result<(), ErrorKind> {
             delete::delete(task_id.to_owned(), path);
         }
         Commands::List{} => {
-            println!("Here are the tasks:")
+            list::list(path);
         }
     }
     return Ok(());

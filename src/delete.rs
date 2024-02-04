@@ -5,10 +5,10 @@ use std::path::PathBuf;
 pub fn delete(task_id: i32, path: PathBuf) {
     let file_opened = opening(&path);
     let lines = BufReader::new(file_opened.unwrap()).lines().enumerate()
-        .filter(|x| (x.0 != task_id as usize))
+        .filter(|x| (x.0 != (task_id-1) as usize))
         .map(|y| y.1.unwrap())
         .collect::<Vec<String>>().join("\n"); 
-    if  read_to_string(&path).unwrap() == lines {
+    if  read_to_string(&path).unwrap() == lines || task_id == 0 {
         println!("Task does not exist");
         return;
     }
