@@ -1,10 +1,10 @@
-use std::env;
+use std::{env, path::PathBuf};
 use clap::{error::*,  Parser, Subcommand};
-mod add; mod delete; mod list;
+mod add; mod gui; mod list; mod delete;
 
 #[derive(Parser)]
 #[command(name = "todo")]
-#[command(version = "v.alpha")]
+#[command(version = "v.alpha_gui")]
 #[command(author = "max-amb <max_a@e.email>")]
 #[command(about = "Todo - A simple todo app written in rust :)", long_about = None)]
 struct Cli {
@@ -14,6 +14,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// To open the gui - requires ncurses
+    Gui {},
     /// To add a task - needs to be done in speech marks for now
     Add { task: String },
     /// To delete a task - use the task ID
@@ -23,23 +25,28 @@ enum Commands {
 }
 
 fn main() -> Result<(), ErrorKind> {
-    // Setting up the path
-    let mut path = env::current_exe().unwrap();
-    path.pop();
-    path.push("tasks");
-
     // Parsing arguments
     let cli = Cli::parse();
     match &cli.command {
+        Commands::Gui {} => {
+            gui::run_gui();
+        }
         Commands::Add { task } => {
-            add::add(task.to_owned(), path);
+            add::console_add(task.to_owned());
         }
         Commands::Delete { task_id } => {
-            delete::delete(task_id.to_owned(), path);
+            delete::console_delete(task_id.to_owned());
         }
         Commands::List{} => {
-            list::list(path);
+            list::console_list();
         }
     }
     return Ok(());
+}
+
+pub fn generate_path() -> PathBuf {
+    let mut path = env::current_exe().unwrap();
+    path.pop();
+    path.push("tasks");
+    path
 }
